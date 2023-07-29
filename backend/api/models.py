@@ -49,3 +49,6 @@ class Reservation(Base):
     class Meta:
         verbose_name = "Reservation"
         verbose_name_plural = "Reservations"
+
+    def __str__(self):
+        return f"Reservation for {self.user}, {self.reservation_date}"
