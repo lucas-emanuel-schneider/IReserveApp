@@ -1,13 +1,18 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes)
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework import status
-# from .serializers import TaskSerializer, UserSerializer
-# from .models import Employee
+from .serializers import WorkStationSerializer
+from .models import WorkStation
 from django.http import JsonResponse
 import json
+from rest_framework.permissions import IsAuthenticated
 from django.middleware.csrf import get_token
 from django.contrib.auth import authenticate, login
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_protect
 
 # Create your views here.
 
@@ -18,11 +23,12 @@ def get_csrf_token(request):
     return JsonResponse({'X-CSRFToken': token})
 
 
-@csrf_exempt
+@api_view(['POST'])
+@csrf_protect
 def login_user(request):
     if request.method == 'POST':
         try:
-            data = json.loads(request.body)
+            data = request.data
             email = data['email']
             password = data['password']
         except (json.JSONDecodeError, KeyError):
@@ -38,6 +44,15 @@ def login_user(request):
                 return JsonResponse({'error': 'Invalid email or password'})
         else:
             return JsonResponse({'error': 'Missing email or password'})
+
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_stations(request):
+    stations = WorkStation.objects.all()
+    serialized_stations = WorkStationSerializer(stations, many=True)
+    return Response(serialized_stations.data, status=status.HTTP_200_OK)
 
 
 # @api_view(['POST'])
