@@ -4,9 +4,10 @@ from rest_framework.decorators import (
     authentication_classes,
     permission_classes)
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
-from .serializers import WorkStationSerializer
-from .models import WorkStation
+from .serializers import WorkStationSerializer, ReservationSerializer
+from .models import WorkStation, Reservation
 from django.http import JsonResponse
 import json
 from rest_framework.permissions import IsAuthenticated
@@ -39,7 +40,9 @@ def login_user(request):
 
             if user is not None:
                 login(request, user)
-                return JsonResponse({'X-CSRFToken': get_token(request)})
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+                return JsonResponse({'access_token': access_token})
             else:
                 return JsonResponse({'error': 'Invalid email or password'})
         else:
@@ -70,6 +73,27 @@ def logout_user(request):
     if request.method == 'POST':
         request.session.flush()
         return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_reservations(request):
+    reservations = Reservation.objects.select_related('workStation')
+    serialized_reservations = ReservationSerializer(reservations, many=True)
+    return Response(serialized_reservations.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+@csrf_protect
+def post_reservation(request):
+    serialized_reservation = ReservationSerializer(data=request.data)
+    if serialized_reservation.is_valid():
+        serialized_reservation.save()
+        return Response(status=status.HTTP_201_CREATED)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 # @api_view(['GET'])
