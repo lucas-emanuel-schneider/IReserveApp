@@ -16,9 +16,14 @@ class WorkStationSerializer(serializers.ModelSerializer):
 
 
 class ReservationSerializer(serializers.ModelSerializer):
-    user_name = serializers.CharField(source='user.username', read_only=True)
-    user_id = serializers.IntegerField(source='user.id', read_only=True)
-    workStation = WorkStationSerializer()
+    user_name = serializers.CharField(
+        source='user_id.username', read_only=True)
+    user_id = serializers.IntegerField(source='user_id.id', read_only=True)
+    work_station_name = serializers.CharField(
+        source='workStation_id.station', read_only=True)
+    work_station_id = serializers.IntegerField(
+        source='workStation_id.id', read_only=True)
+    # work_station = WorkStationSerializer(read_only=True)
 
     class Meta:
         model = Reservation
@@ -28,6 +33,8 @@ class ReservationSerializer(serializers.ModelSerializer):
             'updated_at',
             'reservation_date',
             'user_id',
-            'workStation',
+            'work_station_name',
+            'work_station_id',
+            # 'work_station',
             'user_name',
             ]

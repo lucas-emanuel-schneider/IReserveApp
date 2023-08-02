@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.hashers import check_password
 
 
 # Create your models here.
@@ -42,22 +41,8 @@ class Account_Manager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def authenticate(self, email=None, password=None):
-        if not email or not password:
-            return None
-
-        try:
-            user = self.get(email=email)
-            if user.check_password(password):
-                return user
-        except Employee.DoesNotExist:
-            pass
-
-        return None
-
 
 class Employee(AbstractBaseUser, Base):
-    mobile = models.CharField("phone", max_length=255, null=False, blank=False)
     address = models.CharField(
         "address", max_length=255, null=False, blank=False)
     email = models.EmailField(
@@ -71,7 +56,7 @@ class Employee(AbstractBaseUser, Base):
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
 
     objects = Account_Manager()
 
@@ -99,18 +84,20 @@ class WorkStation(Base):
 
 
 class Reservation(Base):
-    user = models.ForeignKey(
+    user_id = models.ForeignKey(
         Employee,
         on_delete=models.CASCADE,
-        to_field='id', related_name='user',
+        related_name='user_id',
+        to_field='id',
         null=False, blank=False,
     )
     reservation_date = models.DateField(
         "reservation_date", null=False, blank=False)
-    workStation = models.ForeignKey(
+    workStation_id = models.ForeignKey(
         WorkStation,
+        to_field='id',
         on_delete=models.CASCADE,
-        to_field='id', related_name='workStation',
+        related_name='workStation_id',
         null=False, blank=False)
 
     class Meta:
@@ -118,4 +105,5 @@ class Reservation(Base):
         verbose_name_plural = "Reservations"
 
     def __str__(self):
-        return f"Reservation for {self.user}, {self.reservation_date}"
+        username = self.user_id.username
+        return f"Reservation for {username}, {self.reservation_date}"
