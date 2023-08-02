@@ -84,20 +84,15 @@ class WorkStation(Base):
 
 
 class Reservation(Base):
-    user_id = models.ForeignKey(
+    user = models.ForeignKey(
         Employee,
         on_delete=models.CASCADE,
-        related_name='user_id',
-        to_field='id',
         null=False, blank=False,
     )
-    reservation_date = models.DateField(
-        "reservation_date", null=False, blank=False)
-    workStation_id = models.ForeignKey(
+    reservation_date = models.DateField(null=False, blank=False)
+    work_station = models.ForeignKey(
         WorkStation,
-        to_field='id',
         on_delete=models.CASCADE,
-        related_name='workStation_id',
         null=False, blank=False)
 
     class Meta:
@@ -105,5 +100,5 @@ class Reservation(Base):
         verbose_name_plural = "Reservations"
 
     def __str__(self):
-        username = self.user_id.username
+        username = self.user.username
         return f"Reservation for {username}, {self.reservation_date}"

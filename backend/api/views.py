@@ -14,7 +14,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.middleware.csrf import get_token
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
-from rest_framework.permissions import AllowAny
+# from rest_framework.permissions import AllowAny
+
 
 # Create your views here.
 
@@ -79,21 +80,12 @@ def get_reservations(request):
 
 
 @api_view(['POST'])
-@csrf_exempt
-# @permission_classes([AllowAny])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-# @csrf_protect
+@csrf_protect
 def post_reservation(request):
-    data = {
-        'user_id': request.user.id,
-        'user_name': request.user.username,
-        'reservation_date': request.data.get('reservation_date', None),
-        'work_station_id': request.data.get('work_station_id', None),
-        'work_station_name': request.data.get('work_station_name', None),
-    }
-    print(data)
-    serialized_reservation = ReservationSerializer(data=data)
+    serialized_reservation = ReservationSerializer(data=request.data)
+    print(serialized_reservation, 'SERIALIZED_RESERVATION')
     if serialized_reservation.is_valid():
         serialized_reservation.save()
         return Response(status=status.HTTP_201_CREATED)
@@ -101,3 +93,14 @@ def post_reservation(request):
     print(serialized_reservation.errors)
     return Response(
         serialized_reservation.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+@csrf_protect
+def delete_reservation(request, reservation_id):
+    print(reservation_id)
+    reservation = Reservation.objects.get(id=reservation_id)
+    reservation.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
