@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>Bem Vindo(a)</h1>
+    <h1>Bem Vindo(a) a página de login</h1>
     <Login />
   </div>
 </template>
@@ -9,6 +9,6 @@
 import Vue from 'vue'
 
 export default Vue.extend({
-  name: 'IndexPage'
+  name: 'IndexPage',
 })
 </script>
