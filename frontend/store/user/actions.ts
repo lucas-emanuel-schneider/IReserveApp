@@ -18,7 +18,10 @@ loginUser: async (context: any, { email, password }: any) => {
         headers });
 
       if (status === 200) {
-      return { isAuthenticated: true, token: `Bearer ${logData.access_token}` }
+      return {
+        isAuthenticated: true,
+        token: `Bearer ${logData.access_token}`,
+        user: logData.user }
       }
     } catch (error) {
       console.error('Erro na requisição de login:', error);

@@ -12,7 +12,7 @@ urlpatterns = [
     path('get-csrf-token', get_csrf_token, name='get-csrf-token'),
     path('login', login_user, name='login'),
     path('logout', logout_user, name='logout'),
-    path("reservations", get_reservations, name="reservations"),
+    path("reservations/<int:user_id>", get_reservations, name="reservations"),  ## modificado para funcionar pela URL pq o token ta dando ruim
     path("reservations/create", post_reservation, name="create-reservation"),
     path(
         "reservations/delete/<int:reservation_id>",

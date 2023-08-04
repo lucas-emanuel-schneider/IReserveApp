@@ -37,12 +37,13 @@ CORS_ALLOW_HEADERS = [
     'X-CSRFToken',
     'Content-Type',
     'HTTP_X_XSRF_TOKEN',
-    "authorization",
+    'Authorization',
 ]
 
 CORS_EXPOSE_HEADERS = [
     'X-CSRFToken',
     'Content-Type',
+    'Authorization',
 ]
 
 CORS_ALLOW_CREDENTIALS = True

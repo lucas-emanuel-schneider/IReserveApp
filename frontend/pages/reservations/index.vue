@@ -1,27 +1,36 @@
 <template>
 <div>
-  <div v-if="$fetchState.pending">
-    Carregando...
-  </div>
-<div v-else>
   <h1>Página de reservas, onde vai ta as tuas reservas já feitas!</h1>
-  <div v-for="product in products" :key="product.id">
-    {{ product.title }}
-  </div>
+  <div v-for="reserv in reservations" :key="reserv.id">
+    {{ reserv.title }}
 </div>
 </div>
 </template>
 
 <script>
+  import { mapActions, mapState } from 'vuex';
 export default {
   data() {
     return {
-      products: []
+      reservations: []
     };
   },
-  async fetch() {
-    this.products = await this.$axios.$get('https://jsonplaceholder.typicode.com/posts?_limit=5')
-  }
+  methods: {
+    ...mapActions('reservations', ['getReservationsAction']),
+    ...mapState('user', ['user_id']),
+    async getReservations() {
+    const token = localStorage.getItem('token');
+        if (!token) {
+          this.$router.push('/');
+          return;
+        }
+      const id = this.user_id;
+    const { status, data } = await this.getReservationsAction(token, id)
+    }
+  },
+  mounted() {
+    this.getReservations()
+  },
 }
 </script>
 

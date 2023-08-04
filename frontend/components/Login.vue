@@ -19,14 +19,17 @@ export default {
   },
   methods: {
     ...mapActions('user', ['loginUser']),
-    ...mapMutations('user', ['setIsLoggedIn']),
+    ...mapMutations('user', ['setIsLoggedIn', 'setUsername', 'setEmail', 'setUserId']),
 
     async handleSubmit() {
       const { email, password } = this;
       const response = await this.loginUser({email, password})
       if (response.isAuthenticated === true) {
         localStorage.setItem('token', response.token);
-        this.setIsLoggedIn()
+        this.setIsLoggedIn(true)
+        this.setEmail(response.user.email)
+        this.setUsername(response.user.username)
+        this.setUserId(response.user.id)
         this.$router.push('/reservations')
       }
     }

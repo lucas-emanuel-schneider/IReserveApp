@@ -10,21 +10,21 @@ from .serializers import WorkStationSerializer, ReservationSerializer
 from .models import WorkStation, Reservation
 from django.http import JsonResponse
 import json
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.middleware.csrf import get_token
 from django.contrib.auth import authenticate, login
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 
 
+# @ensure_csrf_cookie não consegui setar o cookie na resposta
 @api_view(['GET'])
 def get_csrf_token(request):
     token = get_token(request)
-    #  aqui to tentando setar o cookie...
     return JsonResponse({'X-CSRFToken': token})
 
 
 @api_view(['POST'])
-@csrf_protect
+# @csrf_protect não consegui fazer funcionar...
 def login_user(request):
     if request.method == 'POST':
         try:
@@ -39,9 +39,13 @@ def login_user(request):
 
             if user is not None:
                 login(request, user)
+                user_response = {
+                    "id": user.id,
+                    "email": user.email, "username": user.username}
                 refresh = RefreshToken.for_user(user)
                 access_token = str(refresh.access_token)
-                return JsonResponse({'access_token': access_token})
+                return JsonResponse({
+                    'access_token': access_token, "user": user_response})
             else:
                 return JsonResponse({
                     'error': 'Invalid email or password'}, status=400)
@@ -68,19 +72,18 @@ def logout_user(request):
 
 
 @api_view(['GET'])
-@authentication_classes([JWTAuthentication])
+# @authentication_classes([JWTAuthentication]) precisa consertar isso aqui!
 @csrf_exempt
-@permission_classes([IsAuthenticated])
-def get_reservations(request):
-    print(request.user.id)
-    reservations = Reservation.objects.filter(user_id=request.user)
+# @permission_classes([AllowAny])
+def get_reservations(request, user_id):
+    reservations = Reservation.objects.filter(user_id=user_id)
     serialized_reservations = ReservationSerializer(reservations, many=True)
     return Response(serialized_reservations.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+# @authentication_classes([JWTAuthentication])
+# @permission_classes([IsAuthenticated])
 # @csrf_protect não consegui fazer funcionar...
 def post_reservation(request):
     serialized_reservation = ReservationSerializer(data=request.data)
@@ -97,7 +100,7 @@ def post_reservation(request):
 @api_view(['DELETE'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-@csrf_protect
+# @csrf_protect nao consegui fazer funcionar...
 def delete_reservation(request, reservation_id):
     print(reservation_id)
     reservation = Reservation.objects.get(id=reservation_id)
