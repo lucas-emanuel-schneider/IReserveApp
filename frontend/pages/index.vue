@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>Bem Vindo(a) a página de login</h1>
+    <Welcome />
     <Login />
   </div>
 </template>

@@ -8,7 +8,7 @@ class EmailBackend(BaseBackend):
             user = Employee.objects.get(email=email)
             #  problemas na autenticação nesse ponto devido a model custom
             #  deixei sem o hash já que ainda não consegui solucionar
-            print('testando dentro do auth', user.check_password(password))
+            # print('testando dentro do auth', user.check_password(password))
             if user.password == password:
                 return user
             else:

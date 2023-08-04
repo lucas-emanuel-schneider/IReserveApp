@@ -14,15 +14,12 @@ from rest_framework.permissions import IsAuthenticated
 from django.middleware.csrf import get_token
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
-# from rest_framework.permissions import AllowAny
-
-
-# Create your views here.
 
 
 @api_view(['GET'])
 def get_csrf_token(request):
     token = get_token(request)
+    #  aqui to tentando setar o cookie...
     return JsonResponse({'X-CSRFToken': token})
 
 
@@ -46,9 +43,11 @@ def login_user(request):
                 access_token = str(refresh.access_token)
                 return JsonResponse({'access_token': access_token})
             else:
-                return JsonResponse({'error': 'Invalid email or password'})
+                return JsonResponse({
+                    'error': 'Invalid email or password'}, status=400)
         else:
-            return JsonResponse({'error': 'Missing email or password'})
+            return JsonResponse({
+                'error': 'Missing email or password'}, status=405)
 
 
 @api_view(['GET'])
@@ -82,7 +81,7 @@ def get_reservations(request):
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-@csrf_protect
+# @csrf_protect não consegui fazer funcionar...
 def post_reservation(request):
     serialized_reservation = ReservationSerializer(data=request.data)
     print(serialized_reservation, 'SERIALIZED_RESERVATION')
