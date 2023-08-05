@@ -16,7 +16,6 @@ loginUser: async (context: any, { email, password }: any) => {
       };
       const { status, data: logData } = await axios.post('http://127.0.0.1:8000/api/v1/login', data, {
         headers });
-
       if (status === 200) {
       return {
         isAuthenticated: true,

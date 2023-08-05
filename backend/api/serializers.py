@@ -16,14 +16,14 @@ class WorkStationSerializer(serializers.ModelSerializer):
 
 
 class ReservationSerializer(serializers.ModelSerializer):
-    user = serializers.PrimaryKeyRelatedField(
+    user_id = serializers.PrimaryKeyRelatedField(
         queryset=Employee.objects.all(),
-        write_only=True
     )
-    work_station = serializers.PrimaryKeyRelatedField(
+    work_station_id = serializers.PrimaryKeyRelatedField(
         queryset=WorkStation.objects.all(),
-        write_only=True
     )
+    work_station_name = serializers.StringRelatedField(
+        source='work_station.station', read_only=True)
 
     class Meta:
         model = Reservation
@@ -32,6 +32,16 @@ class ReservationSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'reservation_date',
-            'user',
-            'work_station',
+            'user_id',
+            'work_station_id',
+            'work_station_name',
         ]
+
+    def create(self, validated_data):
+        print(validated_data['work_station_id'].id, 'AAAAAAAAAAAAAAAAAAAAAA')
+        data_format = {
+            'user_id': validated_data['user_id'].id,
+            'work_station_id': validated_data['work_station_id'].id,
+            'reservation_date': validated_data["reservation_date"],
+        }
+        return Reservation.objects.create(**data_format)

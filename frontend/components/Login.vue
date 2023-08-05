@@ -26,6 +26,8 @@ export default {
       const response = await this.loginUser({email, password})
       if (response.isAuthenticated === true) {
         localStorage.setItem('token', response.token);
+        localStorage.setItem('user', JSON.stringify(response.user));
+
         this.setIsLoggedIn(true)
         this.setEmail(response.user.email)
         this.setUsername(response.user.username)

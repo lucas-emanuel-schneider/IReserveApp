@@ -1,9 +1,9 @@
 export default {
-  setEmail(state: any, payload: any) {
-    state.email = payload.email;
+  setEmail(state: any, payload: string) {
+    state.email = payload;
 },
-  setUsername(state: any, payload: any) {
-    state.username = payload.username;
+  setUsername(state: any, payload: string) {
+    state.username = payload;
 },
   setUserId(state:any, id: number) {
     state.userId = id;

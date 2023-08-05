@@ -55,11 +55,11 @@ def login_user(request):
 
 
 @api_view(['GET'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+# @authentication_classes([JWTAuthentication])
+# @permission_classes([IsAuthenticated])
 @csrf_exempt
 def get_stations(request):
-    stations = WorkStation.objects.all()
+    stations = WorkStation.objects.filter(available=True)
     serialized_stations = WorkStationSerializer(stations, many=True)
     return Response(serialized_stations.data, status=status.HTTP_200_OK)
 
@@ -85,9 +85,16 @@ def get_reservations(request, user_id):
 # @authentication_classes([JWTAuthentication])
 # @permission_classes([IsAuthenticated])
 # @csrf_protect não consegui fazer funcionar...
+@csrf_exempt
 def post_reservation(request):
-    serialized_reservation = ReservationSerializer(data=request.data)
-    print(serialized_reservation, 'SERIALIZED_RESERVATION')
+    print(request.data, 'DATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
+    data = {
+        'user_id': int(request.data['user_id']),
+        'reservation_date': request.data['reservation_date'],
+        'work_station_id': int(request.data['work_station_id']),
+    }
+    serialized_reservation = ReservationSerializer(data=data)
+    # print(serialized_reservation, 'SERIALIZED_RESERVATION')
     if serialized_reservation.is_valid():
         serialized_reservation.save()
         return Response(status=status.HTTP_201_CREATED)
@@ -98,8 +105,8 @@ def post_reservation(request):
 
 
 @api_view(['DELETE'])
-@authentication_classes([JWTAuthentication])
-@permission_classes([IsAuthenticated])
+# @authentication_classes([JWTAuthentication])
+# @permission_classes([IsAuthenticated])
 # @csrf_protect nao consegui fazer funcionar...
 def delete_reservation(request, reservation_id):
     print(reservation_id)

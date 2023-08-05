@@ -1,31 +1,64 @@
 <template>
-<div>
-  <h1>Página de reservas, onde vai ta as tuas reservas já feitas!</h1>
-  <div v-for="reserv in reservations" :key="reserv.id">
-    {{ reserv.title }}
-</div>
-</div>
+  <div>
+    <h2>Reservas atuais</h2>
+    <div v-if="isLoading">
+      Carregando...
+    </div>
+    <div v-else>
+      <template v-if="reservations.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Estação</th>
+              <th>Desmarcar</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="reserv in reservations" :key="reserv.id">
+              <td>{{ reserv.reservation_date }}</td>
+              <td>{{ reserv.work_station_name }}</td>
+              <td>
+                <button @click="navigateToReservation(reserv.id)">X</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </template>
+      <template v-else>
+        Você ainda não possui reservas.
+      </template>
+    </div>
+  </div>
 </template>
 
 <script>
-  import { mapActions, mapState } from 'vuex';
+  import { mapActions } from 'vuex';
 export default {
   data() {
     return {
-      reservations: []
+      reservations: [],
+      isLoading: true,
     };
   },
   methods: {
     ...mapActions('reservations', ['getReservationsAction']),
-    ...mapState('user', ['user_id']),
     async getReservations() {
     const token = localStorage.getItem('token');
-        if (!token) {
+      if (!token) {
           this.$router.push('/');
           return;
         }
-      const id = this.user_id;
-    const { status, data } = await this.getReservationsAction(token, id)
+    const userStorage = localStorage.getItem('user');
+    const user = JSON.parse(userStorage)
+    const { status, data } = await this.getReservationsAction({token, id: user.id})
+      if (status === 200) {
+        this.reservations = data;
+        this.isLoading = false;
+      }
+    },
+    navigateToReservation(reservId) {
+      this.$router.push(`reservations/delete/${reservId}`);
     }
   },
   mounted() {
