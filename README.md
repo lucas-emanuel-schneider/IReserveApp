@@ -7,9 +7,7 @@ Ele tem como objetivo criar uma aplicação fullstack para marcações de datas 
 
 ## Configurando para rodar o backend:
 
-```
-python -m venv .venv
-```
+
 ```
 python -m venv .venv
 ```
