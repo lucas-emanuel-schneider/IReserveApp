@@ -68,10 +68,13 @@ export default {
         user_id: Number(user.id)
       };
 
-      const { status, data } = await this.createReservationAction({ token, reservationData })
-      if (status === 200) {
-        this.reservations = data;
+      const { status } = await this.createReservationAction({ token, reservationData });
+      console.log('STATUS E DATA DPS DO CREATE', status)
+      if (status === 201) {
         this.isLoading = false;
+        window.alert('Reserva criada!');
+        this.reservationDate = '';
+        this.workStationId = null;
       }
     },
     },

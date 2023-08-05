@@ -19,7 +19,7 @@
               <td>{{ reserv.reservation_date }}</td>
               <td>{{ reserv.work_station_name }}</td>
               <td>
-                <button @click="navigateToReservation(reserv.id)">X</button>
+                <button @click="confirmDeleteReservation(reserv.id)">X</button>
               </td>
             </tr>
           </tbody>
@@ -42,13 +42,17 @@ export default {
     };
   },
   methods: {
-    ...mapActions('reservations', ['getReservationsAction']),
-    async getReservations() {
-    const token = localStorage.getItem('token');
+    ...mapActions('reservations', ['getReservationsAction', 'deleteReservationAction']),
+    getToken() {
+      const token = localStorage.getItem('token');
       if (!token) {
           this.$router.push('/');
-          return;
+          return false;
         }
+        return token;
+    },
+    async getReservations() {
+    const token = this.getToken()
     const userStorage = localStorage.getItem('user');
     const user = JSON.parse(userStorage)
     const { status, data } = await this.getReservationsAction({token, id: user.id})
@@ -57,8 +61,16 @@ export default {
         this.isLoading = false;
       }
     },
-    navigateToReservation(reservId) {
-      this.$router.push(`reservations/delete/${reservId}`);
+    async confirmDeleteReservation(reservId) {
+      const shouldDelete = window.confirm('Tem certeza que deseja deletar esta reserva?');
+      if (!shouldDelete) return
+      const token = this.getToken()
+      const { status } = await this.deleteReservationAction({ token, id: reservId });
+
+      if (status !== 204 ) return window.alert('Não foi possível deletar a reserva.');
+
+      window.alert('Reserva deletada!');
+        this.getReservations();
     }
   },
   mounted() {

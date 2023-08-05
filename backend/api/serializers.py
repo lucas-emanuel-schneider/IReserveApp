@@ -38,7 +38,6 @@ class ReservationSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        print(validated_data['work_station_id'].id, 'AAAAAAAAAAAAAAAAAAAAAA')
         data_format = {
             'user_id': validated_data['user_id'].id,
             'work_station_id': validated_data['work_station_id'].id,

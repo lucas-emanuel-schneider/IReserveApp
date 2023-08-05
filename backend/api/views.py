@@ -1,16 +1,17 @@
 from rest_framework.response import Response
 from rest_framework.decorators import (
     api_view,
-    authentication_classes,
-    permission_classes)
-from rest_framework_simplejwt.authentication import JWTAuthentication
+    # authentication_classes,
+    # permission_classes
+    )
+# from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import status
 from .serializers import WorkStationSerializer, ReservationSerializer
 from .models import WorkStation, Reservation
 from django.http import JsonResponse
 import json
-from rest_framework.permissions import IsAuthenticated, AllowAny
+# from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.middleware.csrf import get_token
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import csrf_exempt
@@ -87,14 +88,12 @@ def get_reservations(request, user_id):
 # @csrf_protect não consegui fazer funcionar...
 @csrf_exempt
 def post_reservation(request):
-    print(request.data, 'DATAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
     data = {
         'user_id': int(request.data['user_id']),
         'reservation_date': request.data['reservation_date'],
         'work_station_id': int(request.data['work_station_id']),
     }
     serialized_reservation = ReservationSerializer(data=data)
-    # print(serialized_reservation, 'SERIALIZED_RESERVATION')
     if serialized_reservation.is_valid():
         serialized_reservation.save()
         return Response(status=status.HTTP_201_CREATED)
@@ -109,7 +108,13 @@ def post_reservation(request):
 # @permission_classes([IsAuthenticated])
 # @csrf_protect nao consegui fazer funcionar...
 def delete_reservation(request, reservation_id):
-    print(reservation_id)
-    reservation = Reservation.objects.get(id=reservation_id)
-    reservation.delete()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    try:
+        reservation = Reservation.objects.get(id=reservation_id)
+        reservation.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    except Reservation.DoesNotExist:
+        return Response(
+            {"error": "Reserva não encontrada."},
+            status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
