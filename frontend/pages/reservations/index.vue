@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div class="reservation-container">
     <h2>Reservas atuais</h2>
     <div v-if="isLoading">
-      Carregando...
+      <Loading />
     </div>
     <div v-else>
       <template v-if="reservations.length > 0">
-        <table>
+        <table class="reservation-table">
           <thead>
             <tr>
               <th>Data</th>
@@ -18,15 +18,15 @@
             <tr v-for="reserv in reservations" :key="reserv.id">
               <td>{{ reserv.reservation_date }}</td>
               <td>{{ reserv.work_station_name }}</td>
-              <td>
-                <button @click="confirmDeleteReservation(reserv.id)">X</button>
+              <td class="center-button">
+                <button @click="confirmDeleteReservation(reserv.id)" class="delete-button">X</button>
               </td>
             </tr>
           </tbody>
         </table>
       </template>
       <template v-else>
-        Você ainda não possui reservas.
+        <p class="no-reservation-message">Você ainda não possui reservas.</p>
       </template>
     </div>
   </div>
@@ -80,5 +80,59 @@ export default {
 </script>
 
 <style>
+.reservation-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.reservation-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.reservation-table th {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+}
+
+.reservation-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.center-button {
+  text-align: center;
+}
+
+.delete-button {
+  padding: 6px 12px;
+  background-color: #c33b49;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.delete-button:hover {
+  background-color: #c82333;
+}
+
+.no-reservation-message {
+  color: #999;
+  font-size: 18px;
+  text-align: center;
+}
+
 
 </style>
